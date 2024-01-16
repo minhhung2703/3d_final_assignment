@@ -40,7 +40,7 @@ let jump = false;
 let vel = 0;
 let nextCactusSpawnTime = 0;
 let nextPterodactylResetTime = 0;
-let score = 0;
+// let score = 0;
 let isGameOver = true;
 const cactusGroup = new THREE.Group();
 scene.add(cactusGroup);
@@ -268,7 +268,7 @@ function gameOver() {
 
 function restartGame() {
   isGameOver = false;
-  score = 0;
+  // score = 0;
 
   respawnPterodactyl();
 
@@ -378,6 +378,6 @@ function update(delta) {
     pterodactyl.position.x += delta * PTERODACTYL_SPEED;
   }
 
-  score += delta * SCORE_INCREASE_SPEED;
-  infoElement.innerHTML = Math.floor(score).toString().padStart(5, "0");
+  // score += delta * SCORE_INCREASE_SPEED;
+  // infoElement.innerHTML = Math.floor(score).toString().padStart(5, "0");
 }
