@@ -8,7 +8,6 @@ require("./main.css");
 const TREX_JUMP_SPEED = 20;
 
 const CACTUS_SPAWN_X = 20;
-const CACTUS_DESTROY_X = -20;
 const CACTUS_MAX_SCALE = 1;
 const CACTUS_MIN_SCALE = 0.5;
 const CACTUS_SPAWN_MAX_INTERVAL = 2;
@@ -40,7 +39,7 @@ let jump = false;
 let vel = 0;
 let nextCactusSpawnTime = 0;
 let nextPterodactylResetTime = 0;
-// let score = 0;
+let score = 0;
 let isGameOver = true;
 const cactusGroup = new THREE.Group();
 scene.add(cactusGroup);
@@ -62,7 +61,7 @@ function createCamera() {
     0.1,
     1000
   );
-  camera.position.set(0, 1, 10);
+  camera.position.set(-3, 1, 10);
   camera.lookAt(3, 3, 0);
 }
 createCamera();
@@ -70,7 +69,6 @@ createCamera();
 function createRenderer() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x7f7f7f);
   renderer.outputEncoding = THREE.sRGBEncoding;
   document.body.appendChild(renderer.domElement);
 }
@@ -268,7 +266,7 @@ function gameOver() {
 
 function restartGame() {
   isGameOver = false;
-  // score = 0;
+  score = 0;
 
   respawnPterodactyl();
 
@@ -336,14 +334,6 @@ function update(delta) {
     cactus.position.x += FLOOR_SPEED * delta;
   }
 
-  // Remove out-of-the-screen cacti.
-  while (
-    cactusGroup.children.length > 0 &&
-    cactusGroup.children[0].position.x < CACTUS_DESTROY_X // out of the screen
-  ) {
-    cactusGroup.remove(cactusGroup.children[0]);
-  }
-
   // Check collision. T-Rex Shape
   const trexAABB = new THREE.Box3(
     new THREE.Vector3(-1, trex.position.y, 0),
@@ -378,6 +368,6 @@ function update(delta) {
     pterodactyl.position.x += delta * PTERODACTYL_SPEED;
   }
 
-  // score += delta * SCORE_INCREASE_SPEED;
-  // infoElement.innerHTML = Math.floor(score).toString().padStart(5, "0");
+  score += delta * SCORE_INCREASE_SPEED;
+  infoElement.innerHTML = Math.floor(score).toString().padStart(5, "0");
 }

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Diplodocus Run
+* source:	https://sketchfab.com/3d-models/diplodocus-run-bc93c7ddd1a14ab3990abee327b2eb57
+* author:	LostBoyz2078 (https://sketchfab.com/LostModels2025)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Diplodocus Run" (https://sketchfab.com/3d-models/diplodocus-run-bc93c7ddd1a14ab3990abee327b2eb57) by LostBoyz2078 (https://sketchfab.com/LostModels2025) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
