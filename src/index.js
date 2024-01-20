@@ -86,18 +86,9 @@ animate();
 
 function createLighting() {
   directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-  directionalLight.intensity = 2;
-  directionalLight.position.set(0, 10, 0);
-
-  const targetObject = new THREE.Object3D();
-  targetObject.position.set(0, 0, 0);
-  scene.add(targetObject);
-  directionalLight.target = targetObject;
-
   scene.add(directionalLight);
 
   const light = new THREE.AmbientLight(0x7f7f7f); // soft white light
-  light.intensity = 1;
   scene.add(light);
 }
 createLighting();
@@ -125,12 +116,12 @@ function load3DModels() {
       }
       mixers.push(mixer);
     },
-    function (xhr) {
-      console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-    },
-    function (error) {
-      console.log("An error happened");
-    }
+    // function (xhr) {
+    //   console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+    // },
+    // function (error) {
+    //   console.log("An error happened");
+    // }
   );
 
   // Load pterodactyl (flying dinosaur) model.
