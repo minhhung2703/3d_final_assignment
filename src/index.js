@@ -97,7 +97,7 @@ function load3DModels() {
   // Instantiate a loader.
   const loader = new GLTFLoader();
 
-  // Load T-Rex model.
+  // Load girl model.
   loader.load(
     "models/girl/scene.gltf",
     function (gltf) {
@@ -289,11 +289,11 @@ function update(delta) {
     mixer.update(delta);
   }
 
-  // T-rex jump.
+  // girl jump.
   if (jump) {
     jump = false;
 
-    // Start jumpping only when T-rex is on the ground.
+    // Start jumpping only when girl is on the ground.
     if (girl.position.y == 0) {
       vel = GIRL_JUMP_SPEED;
       girl.position.y = vel * delta;
@@ -307,7 +307,7 @@ function update(delta) {
     girl.position.y = 0;
   }
 
-  // Spawn new cacti.
+  // Spawn new trees.
   if (clock.elapsedTime > nextTreesSpawnTime) {
     const interval = randomFloat(
       TREES_SPAWN_MIN_INTERVAL,
@@ -328,7 +328,7 @@ function update(delta) {
     }
   }
 
-  // Move cacti.
+  // Move trees.
   for (const trees of treesGroup.children) {
     trees.position.x += FLOOR_SPEED * delta;
   }
