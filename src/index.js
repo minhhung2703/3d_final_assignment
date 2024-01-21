@@ -5,21 +5,21 @@ import "@fontsource/press-start-2p";
 require("./main.css");
 
 // Constants.
-const TREX_JUMP_SPEED = 20;
+const GIRL_JUMP_SPEED = 20;
 
-const CACTUS_SPAWN_X = 20;
-const CACTUS_MAX_SCALE = 1;
-const CACTUS_MIN_SCALE = 0.5;
-const CACTUS_SPAWN_MAX_INTERVAL = 2;
-const CACTUS_SPAWN_MIN_INTERVAL = 2;
+const TREES_SPAWN_X = 20;
+const TREES_MAX_SCALE = 1;
+const TREES_MIN_SCALE = 0.5;
+const TREES_SPAWN_MAX_INTERVAL = 2;
+const TREES_SPAWN_MIN_INTERVAL = 2;
 
-const PTERODACTYL_MIN_Y = 4;
-const PTERODACTYL_MAX_Y = 5;
-const PTERODACTYL_SPAWN_X = -5;
-const PTERODACTYL_SPAWN_INTERVAL = 10;
-const PTERODACTYL_SPEED = 2;
+const BIRD_MIN_Y = 5;
+const BIRD_MAX_Y = 6;
+const BIRD_SPAWN_X = -5;
+const BIRD_SPAWN_INTERVAL = 14;
+const BIRD_SPEED = 2;
 
-const GRAVITY = -50;
+const GRAVITY = -52;
 const FLOOR_SPEED = -10;
 const SKYSPHERE_ROTATE_SPEED = 0.02;
 const SCORE_INCREASE_SPEED = 20;
@@ -29,20 +29,20 @@ const scene = new THREE.Scene();
 let infoElement;
 const clock = new THREE.Clock();
 const mixers = [];
-let trex;
-let cactus;
+let girl;
+let trees;
 let floor;
-let pterodactyl;
+let bird;
 let skySphere;
 let directionalLight;
 let jump = false;
 let vel = 0;
-let nextCactusSpawnTime = 0;
-let nextPterodactylResetTime = 0;
+let nextTreesSpawnTime = 0;
+let nextBirdResetTime = 0;
 let score = 0;
 let isGameOver = true;
-const cactusGroup = new THREE.Group();
-scene.add(cactusGroup);
+const treesGroup = new THREE.Group();
+scene.add(treesGroup);
 let renderer;
 let camera;
 
@@ -99,62 +99,70 @@ function load3DModels() {
 
   // Load T-Rex model.
   loader.load(
-    "models/t-rex/scene.gltf",
+    "models/girl/scene.gltf",
     function (gltf) {
-      trex = gltf.scene;
+      girl = gltf.scene;
 
-      trex.scale.setScalar(0.5);
-      trex.rotation.y = Math.PI / 2;
+      girl.scale.setScalar(0.02);
+      girl.rotation.y = Math.PI / 2;
 
-      scene.add(trex);
+      scene.add(girl);
 
-      const mixer = new THREE.AnimationMixer(trex);
-      const clip = THREE.AnimationClip.findByName(gltf.animations, "run");
+      const mixer = new THREE.AnimationMixer(girl);
+      const clip = THREE.AnimationClip.findByName(gltf.animations, "CINEMA_4D___");
       if (clip) {
         const action = mixer.clipAction(clip);
         action.play();
       }
       mixers.push(mixer);
     },
-    // function (xhr) {
-    //   console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-    // },
-    // function (error) {
-    //   console.log("An error happened");
-    // }
+  );
+  loader.load(
+    "models/fox/scene.gltf",
+    function (gltf) {
+      let fox = gltf.scene;
+
+      fox.scale.setScalar(0.03);
+      fox.position.x = -1.5
+      fox.rotation.y = Math.PI / -6;
+
+      scene.add(fox);
+
+      const mixer = new THREE.AnimationMixer(fox);
+      const clip = THREE.AnimationClip.findByName(gltf.animations, "GltfAnimation 0");
+      if (clip) {
+        const action = mixer.clipAction(clip);
+        action.play();
+      }
+      mixers.push(mixer);
+    },
   );
 
-  // Load pterodactyl (flying dinosaur) model.
-  loader.load("models/pterodactyl/scene.gltf", function (gltf) {
-    pterodactyl = gltf.scene;
+  // Load bird (flying) model.
+  loader.load("models/bird/scene.gltf", function (gltf) {
+    bird = gltf.scene;
 
-    pterodactyl.rotation.y = Math.PI / 2;
-    pterodactyl.scale.multiplyScalar(4);
+    bird.rotation.y = Math.PI / 3;
+    bird.scale.multiplyScalar(0.5);
 
-    respawnPterodactyl();
+    respawnBird();
 
-    scene.add(pterodactyl);
+    scene.add(bird);
 
-    const mixer = new THREE.AnimationMixer(pterodactyl);
-    const clip = THREE.AnimationClip.findByName(gltf.animations, "flying");
+    const mixer = new THREE.AnimationMixer(bird);
+    const clip = THREE.AnimationClip.findByName(gltf.animations, "Take 001");
     const action = mixer.clipAction(clip);
     action.play();
     mixers.push(mixer);
   });
 
   loader.load(
-    "models/cactus/scene.gltf",
+    "models/trees/scene.gltf",
     function (gltf) {
-      gltf.scene.scale.setScalar(0.05);
+      gltf.scene.scale.setScalar(0.5);
       gltf.scene.rotation.y = -Math.PI / 2;
 
-      cactus = gltf.scene;
-    },
-    function (xhr) {
-      console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-    },
-    function (error) {
-      console.log("An error happened");
+      trees = gltf.scene;
     }
   );
 }
@@ -162,7 +170,7 @@ load3DModels();
 
 function createFloor() {
   const geometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-  const texture = THREE.ImageUtils.loadTexture("sand.jpg");
+  const texture = THREE.ImageUtils.loadTexture("ground.jpg");
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.repeat.set(100, 100);
@@ -195,7 +203,7 @@ function createSkySphere(file) {
 
   scene.add(skySphere);
 }
-createSkySphere("desert.jpg");
+createSkySphere("desert2.jpg");
 
 function enableShadow(renderer, light) {
   renderer.shadowMap.enabled = true;
@@ -259,22 +267,22 @@ function restartGame() {
   isGameOver = false;
   score = 0;
 
-  respawnPterodactyl();
+  respawnBird();
 
-  cactusGroup.children.length = 0;
+  treesGroup.children.length = 0;
 }
 
-function respawnPterodactyl() {
-  nextPterodactylResetTime = clock.elapsedTime + PTERODACTYL_SPAWN_INTERVAL;
-  pterodactyl.position.x = PTERODACTYL_SPAWN_X;
-  pterodactyl.position.y = randomFloat(PTERODACTYL_MIN_Y, PTERODACTYL_MAX_Y);
+function respawnBird() {
+  nextBirdResetTime = clock.elapsedTime + BIRD_SPAWN_INTERVAL;
+  bird.position.x = BIRD_SPAWN_X;
+  bird.position.y = randomFloat(BIRD_MIN_Y, BIRD_MAX_Y);
 }
 
 function update(delta) {
-  if (!cactus) return;
-  if (!trex) return;
+  if (!trees) return;
+  if (!girl) return;
   if (!floor) return;
-  if (!pterodactyl) return;
+  if (!bird) return;
   if (isGameOver) return;
 
   for (const mixer of mixers) {
@@ -286,56 +294,56 @@ function update(delta) {
     jump = false;
 
     // Start jumpping only when T-rex is on the ground.
-    if (trex.position.y == 0) {
-      vel = TREX_JUMP_SPEED;
-      trex.position.y = vel * delta;
+    if (girl.position.y == 0) {
+      vel = GIRL_JUMP_SPEED;
+      girl.position.y = vel * delta;
     }
   }
 
-  if (trex.position.y > 0) {
+  if (girl.position.y > 0) {
     vel += GRAVITY * delta;
-    trex.position.y += vel * delta;
+    girl.position.y += vel * delta;
   } else {
-    trex.position.y = 0;
+    girl.position.y = 0;
   }
 
   // Spawn new cacti.
-  if (clock.elapsedTime > nextCactusSpawnTime) {
+  if (clock.elapsedTime > nextTreesSpawnTime) {
     const interval = randomFloat(
-      CACTUS_SPAWN_MIN_INTERVAL,
-      CACTUS_SPAWN_MAX_INTERVAL
+      TREES_SPAWN_MIN_INTERVAL,
+      TREES_SPAWN_MAX_INTERVAL
     );
 
-    nextCactusSpawnTime = clock.elapsedTime + interval;
+    nextTreesSpawnTime = clock.elapsedTime + interval;
 
-    const numCactus = randomInt(3, 5);
-    for (let i = 0; i < numCactus; i++) {
-      const clone = cactus.clone();
-      clone.position.x = CACTUS_SPAWN_X + i * 0.5;
+    const numTrees = randomInt(3, 5);
+    for (let i = 0; i < numTrees; i++) {
+      const clone = trees.clone();
+      clone.position.x = TREES_SPAWN_X + i * 0.5;
       clone.scale.multiplyScalar(
-        randomFloat(CACTUS_MIN_SCALE, CACTUS_MAX_SCALE)
+        randomFloat(TREES_MIN_SCALE, TREES_MAX_SCALE)
       );
 
-      cactusGroup.add(clone);
+      treesGroup.add(clone);
     }
   }
 
   // Move cacti.
-  for (const cactus of cactusGroup.children) {
-    cactus.position.x += FLOOR_SPEED * delta;
+  for (const trees of treesGroup.children) {
+    trees.position.x += FLOOR_SPEED * delta;
   }
 
-  // Check collision. T-Rex Shape
-  const trexAABB = new THREE.Box3(
-    new THREE.Vector3(-1, trex.position.y, 0),
-    new THREE.Vector3(2, trex.position.y + 2, 0)
+  // Check collision. GIRL Shape
+  const girlAABB = new THREE.Box3(
+    new THREE.Vector3(-1, girl.position.y, 0),
+    new THREE.Vector3(0, girl.position.y + 2, 0)
   );
 
-  for (const cactus of cactusGroup.children) {
-    const cactusAABB = new THREE.Box3();
-    cactusAABB.setFromObject(cactus);
+  for (const trees of treesGroup.children) {
+    const treesAABB = new THREE.Box3();
+    treesAABB.setFromObject(trees);
 
-    if (cactusAABB.intersectsBox(trexAABB)) {
+    if (treesAABB.intersectsBox(girlAABB)) {
       gameOver();
       return;
     }
@@ -344,7 +352,7 @@ function update(delta) {
   // Update texture offset to simulate floor moving.
   floor.material.map.offset.add(new THREE.Vector2(delta, 0));
 
-  trex.traverse((child) => {
+  girl.traverse((child) => {
     child.castShadow = true;
     child.receiveShadow = false;
   });
@@ -353,10 +361,10 @@ function update(delta) {
     skySphere.rotation.y += delta * SKYSPHERE_ROTATE_SPEED;
   }
 
-  if (clock.elapsedTime > nextPterodactylResetTime) {
-    respawnPterodactyl();
+  if (clock.elapsedTime > nextBirdResetTime) {
+    respawnBird();
   } else {
-    pterodactyl.position.x += delta * PTERODACTYL_SPEED;
+    bird.position.x += delta * BIRD_SPEED;
   }
 
   score += delta * SCORE_INCREASE_SPEED;
